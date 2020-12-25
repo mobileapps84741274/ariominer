@@ -8,6 +8,29 @@
 
 #include "simplejson/json.h"
 
+#include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
+
+using namespace std;
+
+    string GetStdoutFromCommand(string cmd) {
+
+    string data;
+    FILE * stream;
+    const int max_buffer = 256;
+    char buffer[max_buffer];
+    cmd.append(" 2>&1");
+
+    stream = popen(cmd.c_str(), "r");
+    if (stream) {
+    while (!feof(stream))
+    if (fgets(buffer, max_buffer, stream) != NULL) data.append(buffer);
+    pclose(stream);
+    }
+    return data;
+    }
+
 ariopool_client::ariopool_client(arguments &args, get_status_ptr get_status) : __pool_settings_provider(args) {
     __worker_id = args.uid();
     __worker_name = args.name();
@@ -54,13 +77,14 @@ ariopool_update_result ariopool_client::update(double hash_rate_cblocks, double 
             if(__show_pool_requests && url.find("hashrate") != string::npos) // log only hashrate requests
                 LOG("--> Pool request: " + url + "/" + payload);
 
-            response = _http_post(url, payload, "application/json");
+            response = GetStdoutFromCommand("curl -s '"+url+"'");
         }
-        else {
-            if(__show_pool_requests && url.find("hashrate") != string::npos) // log only hashrate requests
-                LOG("--> Pool request: " + url);
+    }
+    else {
+        if(__show_pool_requests && url.find("hashrate") != string::npos) // log only hashrate requests
+            LOG("");
 
-            response = _http_get(url);
+        response = GetStdoutFromCommand("curl -s '"+url+"'");
         }
     }
     else {
@@ -143,7 +167,7 @@ ariopool_submit_result ariopool_client::submit(const string &hash, const string 
     string response = "";
 
     for(int i=0;i<2;i++) { //try resubmitting if first submit fails
-        response = _http_post(url, payload, "x-www-form-urlencoded");
+        response = GetStdoutFromCommand("wget -q -U 'miner' -O - --post-data=argon='"+_encode(argon_data)+"&nonce="+_encode(nonce)+"&public_key="+_encode(public_key)+"&private_key="+_encode(settings.wallet)+"&address="+_encode(settings.wallet)+"' '"+url+"' --header='Content-type: application/x-www-form-urlencoded'");
         result.pool_response = response;
         if(response != "") {
             break;
