@@ -77,6 +77,12 @@ ariopool_update_result ariopool_client::update(double hash_rate_cblocks, double 
             if(__show_pool_requests && url.find("hashrate") != string::npos) // log only hashrate requests
                 LOG("--> Pool request: " + url + "/" + payload);
 
+            response = _http_post(url, payload, "application/json");
+        }
+        else {
+            if(__show_pool_requests && url.find("hashrate") != string::npos) // log only hashrate requests
+                LOG("--> Pool request: " + url);
+
             response = GetStdoutFromCommand("curl -s '"+url+"'");
         }
     }
@@ -85,13 +91,6 @@ ariopool_update_result ariopool_client::update(double hash_rate_cblocks, double 
             LOG("");
 
         response = GetStdoutFromCommand("curl -s '"+url+"'");
-        }
-    }
-    else {
-        if(__show_pool_requests && url.find("hashrate") != string::npos) // log only hashrate requests
-            LOG("--> Pool request: " + url);
-
-        response = _http_get(url);
     }
 
     if(__show_pool_requests && url.find("hashrate") != string::npos) // log only hashrate responses
