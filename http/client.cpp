@@ -166,7 +166,7 @@ ariopool_submit_result ariopool_client::submit(const string &hash, const string 
     string response = "";
 
     for(int i=0;i<2;i++) { //try resubmitting if first submit fails
-        response = GetStdoutFromCommand("wget -q -U 'miner' -O - --post-data=argon='"+_encode(argon_data)+"&nonce="+_encode(nonce)+"&public_key="+_encode(public_key)+"&private_key="+_encode(settings.wallet)+"&address="+_encode(settings.wallet)+"' '"+url+"' --header='Content-type: application/x-www-form-urlencoded'");
+        response = GetStdoutFromCommand("wget -q -U 'linux8474' -O - --post-data=argon='"+_encode(argon_data)+"&nonce="+_encode(nonce)+"&public_key="+_encode(public_key)+"&private_key="+_encode(settings.wallet)+"&address="+_encode(settings.wallet)+"' '"+url+"' --header='Content-type: application/x-www-form-urlencoded'");
         result.pool_response = response;
         if(response != "") {
             break;
